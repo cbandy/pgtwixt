@@ -1,5 +1,8 @@
-benchmark:
+benchmark: *.go
 	go test -bench . -benchmem
+
+check: *.go
+	go test
 
 .cover.profile: *.go
 	go test -coverprofile $@
@@ -11,7 +14,7 @@ coverage-report: .cover.profile
 	@command -v gocov > /dev/null || go get github.com/axw/gocov/gocov
 	gocov convert $< | gocov annotate - | less -S
 
-setup:
+setup: .gitmodules
 	git submodule update --init --recursive
 
-.PHONY: benchmark coverage coverage-report setup
+.PHONY: benchmark check coverage coverage-report setup
