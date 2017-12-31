@@ -41,6 +41,35 @@ func TestBackendStreamLogs(t *testing.T) {
 
 	buf.Reset()
 
+	t.Run("Send,Start", func(t *testing.T) {
+		proto.InitStartupMessage(&msg, nil)
+		err := be.Send(&msg)
+
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if expected := []interface{}{"dir", " >B", "type", "Start"}; !reflect.DeepEqual(logged, expected) {
+			t.Errorf("Expected %#v, got %#v", expected, logged)
+		}
+	})
+
+	buf.Reset()
+	be.stream = core.NewBackendStream(nopCloser{buf})
+
+	t.Run("Send,Cancel", func(t *testing.T) {
+		proto.InitCancelRequest(&msg, 0, 0)
+		err := be.Send(&msg)
+
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if expected := []interface{}{"dir", " >B", "type", "Cancel"}; !reflect.DeepEqual(logged, expected) {
+			t.Errorf("Expected %#v, got %#v", expected, logged)
+		}
+	})
+
+	buf.Reset()
+
 	t.Run("Next", func(t *testing.T) {
 		msg.InitFromBytes('B', []byte{0, 0, 0, 0})
 		msg.WriteTo(buf)
@@ -92,22 +121,10 @@ func TestFrontendStreamLogs(t *testing.T) {
 
 	buf.Reset()
 
-	t.Run("Send,Start", func(t *testing.T) {
-		err := fe.Send(&msg)
-
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-		if expected := []interface{}{"dir", "F< ", "type", "Start"}; !reflect.DeepEqual(logged, expected) {
-			t.Errorf("Expected %#v, got %#v", expected, logged)
-		}
-	})
-
-	buf.Reset()
-
 	t.Run("Next,SSL", func(t *testing.T) {
 		buf.Write(sslRequest)
 		err := fe.Next(&msg)
+
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
@@ -127,6 +144,22 @@ func TestFrontendStreamLogs(t *testing.T) {
 			t.Fatalf("Expected no error, got %v", err)
 		}
 		if expected := []interface{}{"dir", "F> ", "type", "Start"}; !reflect.DeepEqual(logged, expected) {
+			t.Errorf("Expected %#v, got %#v", expected, logged)
+		}
+	})
+
+	buf.Reset()
+	fe.stream = core.NewFrontendStream(nopCloser{buf})
+
+	t.Run("Next,Cancel", func(t *testing.T) {
+		proto.InitCancelRequest(&msg, 0, 0)
+		msg.WriteTo(buf)
+		err := fe.Next(&msg)
+
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if expected := []interface{}{"dir", "F> ", "type", "Cancel"}; !reflect.DeepEqual(logged, expected) {
 			t.Errorf("Expected %#v, got %#v", expected, logged)
 		}
 	})

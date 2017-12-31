@@ -12,7 +12,9 @@ func (s loggedStream) log(dir string, m *core.Message) {
 		s.debug("dir", dir, "type", string(m.MsgType()), "size", m.Size())
 	} else {
 		b, _ := m.Force()
-		if len(b) == 4 && b[0] == 0x04 && b[1] == 0xd2 && b[2] == 0x16 && b[3] == 0x2f {
+		if len(b) == 12 && b[0] == 0x04 && b[1] == 0xd2 && b[2] == 0x16 && b[3] == 0x2e {
+			s.debug("dir", dir, "type", "Cancel")
+		} else if len(b) == 4 && b[0] == 0x04 && b[1] == 0xd2 && b[2] == 0x16 && b[3] == 0x2f {
 			s.debug("dir", dir, "type", "SSL")
 		} else {
 			s.debug("dir", dir, "type", "Start")
