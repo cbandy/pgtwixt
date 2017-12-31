@@ -1,4 +1,4 @@
-package main
+package pgtwixt
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ func TestServerAcceptCancel(t *testing.T) {
 	buf := bytes.NewBuffer(make([]byte, 0, 1024))
 	conn := bufConn{nopCloser{buf}}
 	srv := Server{
-		debug: func(...interface{}) error { return nil },
+		Debug: func(...interface{}) error { return nil },
 	}
 
 	testCancel := func(t *testing.T) {
@@ -25,7 +25,7 @@ func TestServerAcceptCancel(t *testing.T) {
 		msg.WriteTo(buf)
 
 		var called bool
-		srv.cancel = func(c CancellationKey) {
+		srv.Cancel = func(c CancellationKey) {
 			called = true
 
 			assert.Equal(t, CancellationKey{id: 2600, secret: 1957}, c)
@@ -40,7 +40,7 @@ func TestServerAcceptCancel(t *testing.T) {
 		msg.WriteTo(buf)
 
 		var called bool
-		srv.session = func(fe FrontendStream, startup map[string]string) {
+		srv.Session = func(fe FrontendStream, startup map[string]string) {
 			called = true
 
 			assert.Equal(t, map[string]string{"user": "mary"}, startup)

@@ -1,4 +1,4 @@
-package main
+package pgtwixt
 
 import (
 	"crypto/tls"
@@ -15,17 +15,17 @@ type CancellationKey struct {
 }
 
 type Server struct {
-	debug LogFunc
-	info  LogFunc
+	Debug LogFunc
+	Info  LogFunc
 	tls   *tls.Config
 
-	cancel  func(CancellationKey)
-	session func(FrontendStream, map[string]string)
+	Cancel  func(CancellationKey)
+	Session func(FrontendStream, map[string]string)
 }
 
 func (s *Server) accept(conn net.Conn) {
 	if err := s.handshake(conn); err != nil {
-		s.info("msg", "Error during handshake", "error", err)
+		s.Info("msg", "Error during handshake", "error", err)
 	}
 }
 
@@ -33,7 +33,7 @@ func (s *Server) accept(conn net.Conn) {
 func (s *Server) handshake(conn net.Conn) (err error) {
 	var msg core.Message
 	fe := FrontendStream{
-		debug:  s.debug,
+		debug:  s.Debug,
 		stream: core.NewFrontendStream(conn),
 	}
 
@@ -69,7 +69,7 @@ func (s *Server) handshake(conn net.Conn) (err error) {
 	if proto.IsStartupMessage(&msg) {
 		var su *proto.StartupMessage
 		if su, err = proto.ReadStartupMessage(&msg); err == nil {
-			s.session(fe, su.Params)
+			s.Session(fe, su.Params)
 		}
 		return
 	}
@@ -77,7 +77,7 @@ func (s *Server) handshake(conn net.Conn) (err error) {
 	if proto.IsCancelRequest(&msg) {
 		var c *proto.CancelRequest
 		if c, err = proto.ReadCancelRequest(&msg); err == nil {
-			s.cancel(CancellationKey{
+			s.Cancel(CancellationKey{
 				id:     c.BackendPid,
 				secret: c.SecretKey,
 			})

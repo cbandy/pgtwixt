@@ -1,4 +1,4 @@
-package main
+package pgtwixt
 
 import (
 	"github.com/uhoh-itsmaciek/femebe/core"
