@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/uhoh-itsmaciek/femebe/core"
+	"github.com/uhoh-itsmaciek/femebe/proto"
 )
 
 type Proxy struct {
@@ -22,6 +23,11 @@ func (*Proxy) pump(errc chan<- error, from, to core.Stream) {
 			break
 		}
 		if err = to.Send(&msg); err != nil {
+			if msg.MsgType() == proto.MsgTerminateX {
+				// The recipient of a Terminate message will immediately close.
+				// Over Unix socket, this manifests as "broken pipe" on write.
+				err = nil
+			}
 			break
 		}
 		if !from.HasNext() {
