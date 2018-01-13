@@ -1,15 +1,16 @@
 
-behave := .env/bin/behave
 pip := .env/bin/pip
+radish := .env/bin/radish
 
 .PHONY: benchmark
 benchmark: *.go
 	go test -bench . -benchmem
 
 .PHONY: check
-check: *.go
+check: *.go features/* radish/*
 	go test
-	PG_BIN=/usr/lib/postgresql/9.6/bin $(behave)
+	go build -o radish/pgtwixt ./cmd/pgtwixt
+	PG_BIN=/usr/lib/postgresql/9.6/bin $(radish) --no-line-jump features
 
 .cover.profile: *.go
 	go test -coverprofile $@
