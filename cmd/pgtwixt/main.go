@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/cbandy/pgtwixt"
 	"github.com/go-kit/kit/log"
@@ -28,17 +29,26 @@ func main() {
 		}
 	}()
 
-	connector := pgtwixt.Connector{
-		Debug: logger.Log,
-		Dialer: pgtwixt.Dialer{
-			Mode: "prefer",
-			Config: tls.Config{
+	var connector pgtwixt.Connector
+
+	if strings.HasPrefix(os.Args[2], "/") {
+		dialer := pgtwixt.UnixDialer{
+			Addr:  os.Args[2],
+			Debug: logger.Log,
+		}
+		connector.Dial = dialer.Dial
+	} else {
+		dialer := pgtwixt.TCPDialer{
+			Addr:    os.Args[2],
+			Debug:   logger.Log,
+			SSLMode: "prefer",
+			SSLConfig: tls.Config{
 				InsecureSkipVerify: true,
 				MinVersion:         tls.VersionTLS12,
 				Renegotiation:      tls.RenegotiateFreelyAsClient,
 			},
-		},
-		Location: os.Args[2],
+		}
+		connector.Dial = dialer.Dial
 	}
 
 	proxy := pgtwixt.Proxy{Info: logger.Log, Startup: connector.Startup}
