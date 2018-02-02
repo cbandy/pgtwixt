@@ -138,9 +138,6 @@ func TestTCPDialerVerify(t *testing.T) {
 			d := TCPDialer{
 				Addr:    listener.Addr().String(),
 				SSLMode: "require",
-				SSLConfig: tls.Config{
-					InsecureSkipVerify: true,
-				},
 			}
 
 			go respond(core.AcceptSSLRequest)
@@ -152,9 +149,6 @@ func TestTCPDialerVerify(t *testing.T) {
 			d := TCPDialer{
 				Addr:    listener.Addr().String(),
 				SSLMode: "require",
-				SSLConfig: tls.Config{
-					InsecureSkipVerify: true,
-				},
 			}
 
 			go respond(core.RejectSSLRequest)
@@ -169,8 +163,7 @@ func TestTCPDialerVerify(t *testing.T) {
 				Addr:    listener.Addr().String(),
 				SSLMode: "verify-ca",
 				SSLConfig: tls.Config{
-					InsecureSkipVerify: true,
-					RootCAs:            pool,
+					RootCAs: pool,
 				},
 			}
 
@@ -184,8 +177,7 @@ func TestTCPDialerVerify(t *testing.T) {
 				Addr:    listener.Addr().String(),
 				SSLMode: "verify-ca",
 				SSLConfig: tls.Config{
-					InsecureSkipVerify: true,
-					RootCAs:            pool,
+					RootCAs: pool,
 				},
 			}
 
@@ -198,9 +190,6 @@ func TestTCPDialerVerify(t *testing.T) {
 			d := TCPDialer{
 				Addr:    listener.Addr().String(),
 				SSLMode: "verify-ca",
-				SSLConfig: tls.Config{
-					InsecureSkipVerify: true,
-				},
 			}
 
 			go respond(core.AcceptSSLRequest)

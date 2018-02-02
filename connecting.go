@@ -72,10 +72,9 @@ func (d *TCPDialer) Dial(ctx context.Context) (BackendStream, error) {
 		err = conn.(*net.TCPConn).SetKeepAlive(true)
 	}
 	if err == nil {
-		conn, err = util.NegotiateTLS(conn, &util.SSLConfig{
-			Mode:   util.SSLMode(d.SSLMode),
-			Config: d.SSLConfig,
-		})
+		cfg := util.SSLConfig{Mode: util.SSLMode(d.SSLMode), Config: d.SSLConfig}
+		cfg.Config.InsecureSkipVerify = d.SSLMode != "verify-full"
+		conn, err = util.NegotiateTLS(conn, &cfg)
 	}
 	if err == nil {
 		err = d.verify(conn)
