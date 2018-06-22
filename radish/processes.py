@@ -6,13 +6,15 @@ import testgres
 
 class PgTwixt(object):
     def __init__(self):
+        self.host = '127.0.0.1'
         self.location = None
+        self.metrics = '127.0.0.1:{}'.format(testgres.reserve_port())
         self.port = testgres.reserve_port()
         self._process = None
 
     def start(self):
         self._process = subprocess.Popen(
-                ['radish/pgtwixt', '127.0.0.1:{}'.format(self.port), self.location],
+                ['radish/pgtwixt', '{0.host}:{0.port}'.format(self), self.metrics, self.location],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT)
         return self

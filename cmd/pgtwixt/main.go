@@ -4,12 +4,16 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
+	"time"
 
 	"github.com/cbandy/pgtwixt"
 	"github.com/go-kit/kit/log"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -19,6 +23,24 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	go func() {
+		metrics := &http.Server{
+			Addr:         os.Args[2],
+			ReadTimeout:  4 * time.Second,
+			WriteTimeout: 4 * time.Second,
+			Handler: promhttp.InstrumentMetricHandler(
+				metricRegistry, promhttp.HandlerFor(
+					metricGatherer, promhttp.HandlerOpts{},
+				),
+			),
+		}
+
+		err := metrics.ListenAndServe()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	go func() {
 		signals := make(chan os.Signal)
@@ -31,14 +53,14 @@ func main() {
 
 	var connector pgtwixt.Connector
 
-	if strings.HasPrefix(os.Args[2], "/") {
+	if strings.HasPrefix(os.Args[3], "/") {
 		connector.Dialer = pgtwixt.UnixDialer{
-			Addr:  os.Args[2],
+			Addr:  os.Args[3],
 			Debug: logger.Log,
 		}
 	} else {
 		connector.Dialer = pgtwixt.TCPDialer{
-			Addr:    os.Args[2],
+			Addr:    os.Args[3],
 			Debug:   logger.Log,
 			SSLMode: "prefer",
 			SSLConfig: tls.Config{
@@ -49,7 +71,14 @@ func main() {
 		}
 	}
 
-	proxy := pgtwixt.Proxy{Info: logger.Log, Startup: connector.Startup}
+	proxy := pgtwixt.Proxy{
+		Info: logger.Log,
+
+		Startup: connector.Startup,
+
+		CountConnect:    metrics.backend.connects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]}).Inc,
+		CountDisconnect: metrics.backend.disconnects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]}).Inc,
+	}
 
 	srv := pgtwixt.Server{
 		Debug: logger.Log,
@@ -64,6 +93,9 @@ func main() {
 			fmt.Printf("%#v\n", startup)
 			proxy.Run(fe, startup)
 		},
+
+		CountConnect:    metrics.frontend.connects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()}).Inc,
+		CountDisconnect: metrics.frontend.disconnects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()}).Inc,
 	}
 
 	err = srv.Serve(listen)

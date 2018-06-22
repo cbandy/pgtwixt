@@ -21,9 +21,13 @@ type Server struct {
 
 	Cancel  func(CancellationKey)
 	Session func(FrontendStream, map[string]string)
+
+	CountConnect    func()
+	CountDisconnect func()
 }
 
 func (s *Server) accept(conn net.Conn) {
+	s.CountConnect()
 	if err := s.handshake(conn); err != nil {
 		s.Info("msg", "Error during handshake", "error", err)
 	}
@@ -36,6 +40,8 @@ func (s *Server) handshake(conn net.Conn) (err error) {
 		debug:  s.Debug,
 		stream: core.NewFrontendStream(conn),
 	}
+	defer s.CountDisconnect()
+	defer func() { _ = fe.Close() }()
 
 	if err = fe.Next(&msg); err != nil {
 		return
@@ -82,7 +88,6 @@ func (s *Server) handshake(conn net.Conn) (err error) {
 				secret: c.SecretKey,
 			})
 		}
-		_ = fe.Close()
 		return
 	}
 

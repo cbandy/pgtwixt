@@ -1,2 +1,4 @@
-radish-bdd == 0.8.0
-testgres == 1.4.1
+prometheus_client == 0.2.0
+radish-bdd == 0.8.2
+requests == 2.19.1
+testgres == 1.7.0

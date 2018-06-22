@@ -18,6 +18,9 @@ func TestServerAcceptCancel(t *testing.T) {
 	conn := bufConn{nopCloser{buf}}
 	srv := Server{
 		Debug: func(...interface{}) error { return nil },
+
+		CountConnect:    func() {},
+		CountDisconnect: func() {},
 	}
 
 	testCancel := func(t *testing.T) {
@@ -49,6 +52,60 @@ func TestServerAcceptCancel(t *testing.T) {
 		srv.accept(conn)
 
 		assert.True(t, called, "Expected session to be called")
+	}
+
+	buf.Reset()
+	t.Run("Cancel", testCancel)
+
+	buf.Reset()
+	t.Run("Startup", testStartup)
+
+	buf.Reset()
+	buf.Write(sslRequest)
+	t.Run("SSL,Cancel", testCancel)
+
+	buf.Reset()
+	buf.Write(sslRequest)
+	t.Run("SSL,Startup", testStartup)
+}
+
+func TestServerAcceptCancelMetrics(t *testing.T) {
+	t.Parallel()
+
+	var msg core.Message
+	buf := bytes.NewBuffer(make([]byte, 0, 1024))
+	conn := bufConn{nopCloser{buf}}
+	srv := Server{
+		Debug: func(...interface{}) error { return nil },
+
+		Cancel:  func(CancellationKey) {},
+		Session: func(FrontendStream, map[string]string) {},
+	}
+
+	testCancel := func(t *testing.T) {
+		proto.InitCancelRequest(&msg, 2600, 1957)
+		msg.WriteTo(buf)
+
+		var connects, disconnects int
+		srv.CountConnect = func() { connects++ }
+		srv.CountDisconnect = func() { disconnects++ }
+		srv.accept(conn)
+
+		assert.Equal(t, 1, connects, "Expected one connect to be counted")
+		assert.Equal(t, 1, disconnects, "Expected one disconnect to be counted")
+	}
+
+	testStartup := func(t *testing.T) {
+		proto.InitStartupMessage(&msg, map[string]string{"user": "mary"})
+		msg.WriteTo(buf)
+
+		var connects, disconnects int
+		srv.CountConnect = func() { connects++ }
+		srv.CountDisconnect = func() { disconnects++ }
+		srv.accept(conn)
+
+		assert.Equal(t, 1, connects, "Expected one connect to be counted")
+		assert.Equal(t, 1, disconnects, "Expected one disconnect to be counted")
 	}
 
 	buf.Reset()

@@ -7,7 +7,7 @@ Feature: Simple Proxy
   settings.
 
 
-  Background: setup
+  Background:
     Given postgres "pg0" is configured to trust connections
       And it is running
     Given pgtwixt is configured to connect to "pg0"

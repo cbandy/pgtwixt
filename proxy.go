@@ -8,8 +8,12 @@ import (
 )
 
 type Proxy struct {
-	Info    LogFunc
+	Info LogFunc
+
 	Startup func(map[string]string) (BackendStream, error)
+
+	CountConnect    func()
+	CountDisconnect func()
 }
 
 // pump copies messages one way between two streams, blocking and flushing when
@@ -41,13 +45,13 @@ func (*Proxy) pump(errc chan<- error, from, to core.Stream) {
 }
 
 func (p *Proxy) Run(fe FrontendStream, startup map[string]string) {
-	defer fe.Close()
-
 	be, err := p.Startup(startup)
 	if err != nil {
 		p.Info("msg", "Error connecting to backend", "error", err)
 		return
 	}
+	p.CountConnect()
+	defer p.CountDisconnect()
 	defer be.Close()
 
 	errc := make(chan error, 1)
