@@ -98,6 +98,10 @@ BTpRJs3hP+x13UXnyUOSWJcGHvy8VWV3EilJU5J7DhMSD1mIVBS1kx6xga2nlRzk
 ZImK7BgsSTBAc60aNwn8O99/cAopSQ==
 -----END PRIVATE KEY-----`
 
+func TestTCPDialerInterface(t *testing.T) {
+	var _ Dialer = TCPDialer{}
+}
+
 func TestTCPDialerVerify(t *testing.T) {
 	t.Parallel()
 

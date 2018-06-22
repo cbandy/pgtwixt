@@ -13,7 +13,7 @@ import (
 )
 
 type Connector struct {
-	Dial func(context.Context) (BackendStream, error)
+	Dialer
 }
 
 // Cancel opens a new connection to the backend and sends a CancelRequest.
@@ -48,6 +48,10 @@ func (cn Connector) Startup(options map[string]string) (BackendStream, error) {
 	return be, err
 }
 
+type Dialer interface {
+	Dial(context.Context) (BackendStream, error)
+}
+
 type TCPDialer struct {
 	Debug LogFunc
 
@@ -57,14 +61,14 @@ type TCPDialer struct {
 	Timeout   time.Duration
 
 	KeepAlivesCount    int
-	KeepAlivesEnable   bool
+	KeepAlivesDisable  bool
 	KeepAlivesIdle     time.Duration
 	KeepAlivesInterval time.Duration
 	// https://github.com/golang/go/blob/master/src/net/tcpsockopt_*.go
 }
 
 // Dial opens a new connection to the backend, negotiates any TLS upgrade, and verifies server certificates.
-func (d *TCPDialer) Dial(ctx context.Context) (BackendStream, error) {
+func (d TCPDialer) Dial(ctx context.Context) (BackendStream, error) {
 	nd := net.Dialer{Timeout: d.Timeout}
 	conn, err := nd.DialContext(ctx, "tcp", d.Addr)
 
@@ -86,7 +90,7 @@ func (d *TCPDialer) Dial(ctx context.Context) (BackendStream, error) {
 	}, err
 }
 
-func (d *TCPDialer) verify(conn net.Conn) error {
+func (d TCPDialer) verify(conn net.Conn) error {
 	tc, ok := conn.(*tls.Conn)
 	if !ok {
 		return nil

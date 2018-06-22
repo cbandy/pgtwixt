@@ -2,6 +2,7 @@ package pgtwixt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -66,4 +67,26 @@ func TestConnectionStringBadQuoting(t *testing.T) {
 	assert.Error(t, result.Parse(`a`))
 	assert.Error(t, result.Parse(`a=`))
 	assert.Error(t, result.Parse(`a='`))
+}
+
+func TestConnectionStringSecondsDuration(t *testing.T) {
+	t.Parallel()
+
+	var cs ConnectionString
+
+	t.Run("Blank", func(t *testing.T) {
+		_, err := cs.SecondsDuration("")
+		assert.Error(t, err)
+	})
+
+	t.Run("Non-Numeric", func(t *testing.T) {
+		_, err := cs.SecondsDuration("asdf")
+		assert.Error(t, err)
+	})
+
+	t.Run("Numeric", func(t *testing.T) {
+		d, err := cs.SecondsDuration("99")
+		assert.NoError(t, err)
+		assert.Equal(t, 99*time.Second, d)
+	})
 }

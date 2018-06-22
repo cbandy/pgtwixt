@@ -8,7 +8,7 @@ benchmark: *.go
 
 .PHONY: check
 check: *.go features/* radish/*
-	go test
+	go test . ./cmd/pgtwixt
 	go build -o radish/pgtwixt ./cmd/pgtwixt
 	PG_BIN=/usr/lib/postgresql/9.6/bin $(radish) --no-line-jump features
 

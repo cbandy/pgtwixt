@@ -21,7 +21,7 @@ type UnixDialer struct {
 }
 
 // Dial opens a new connection to the backend and verifies the owner of the socket.
-func (d *UnixDialer) Dial(ctx context.Context) (BackendStream, error) {
+func (d UnixDialer) Dial(ctx context.Context) (BackendStream, error) {
 	nd := net.Dialer{Timeout: d.Timeout}
 	conn, err := nd.DialContext(ctx, "unix", d.Addr)
 
@@ -35,7 +35,7 @@ func (d *UnixDialer) Dial(ctx context.Context) (BackendStream, error) {
 	}, err
 }
 
-func (d *UnixDialer) verify(conn net.Conn) error {
+func (d UnixDialer) verify(conn net.Conn) error {
 	if d.RequirePeer == "" {
 		return nil
 	}

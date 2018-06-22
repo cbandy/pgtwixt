@@ -32,13 +32,12 @@ func main() {
 	var connector pgtwixt.Connector
 
 	if strings.HasPrefix(os.Args[2], "/") {
-		dialer := pgtwixt.UnixDialer{
+		connector.Dialer = pgtwixt.UnixDialer{
 			Addr:  os.Args[2],
 			Debug: logger.Log,
 		}
-		connector.Dial = dialer.Dial
 	} else {
-		dialer := pgtwixt.TCPDialer{
+		connector.Dialer = pgtwixt.TCPDialer{
 			Addr:    os.Args[2],
 			Debug:   logger.Log,
 			SSLMode: "prefer",
@@ -48,7 +47,6 @@ func main() {
 				Renegotiation:      tls.RenegotiateFreelyAsClient,
 			},
 		}
-		connector.Dial = dialer.Dial
 	}
 
 	proxy := pgtwixt.Proxy{Info: logger.Log, Startup: connector.Startup}

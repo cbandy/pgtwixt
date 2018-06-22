@@ -1,6 +1,10 @@
 package pgtwixt
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+	"time"
+)
 
 type ConnectionString struct {
 	Host, HostAddr, Port []string
@@ -95,4 +99,12 @@ func (c *ConnectionString) Parse(s string) error {
 
 	c.Remainder = make(map[string]string)
 	return g.Parse(s)
+}
+
+func (ConnectionString) SecondsDuration(s string) (time.Duration, error) {
+	n, err := strconv.Atoi(s)
+	if err == nil {
+		return time.Duration(n) * time.Second, nil
+	}
+	return 0, err
 }

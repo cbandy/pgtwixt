@@ -13,6 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestUnixDialerInterface(t *testing.T) {
+	var _ Dialer = UnixDialer{}
+}
+
 func TestUnixDialerRequirePeer(t *testing.T) {
 	t.Parallel()
 
