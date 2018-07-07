@@ -10,7 +10,7 @@ benchmark: *.go
 check: *.go features/* radish/*
 	go test . ./cmd/pgtwixt
 	go build -o radish/pgtwixt ./cmd/pgtwixt
-	PG_BIN=/usr/lib/postgresql/9.6/bin $(radish) --no-line-jump features
+	PG_BIN=/usr/lib/postgresql/9.6/bin $(radish) --no-line-jump --with-traceback features
 
 .cover.profile: *.go
 	go test -coverprofile $@

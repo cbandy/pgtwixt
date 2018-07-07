@@ -9,7 +9,11 @@ import (
 	"github.com/cbandy/pgtwixt"
 )
 
-func dialers(cs pgtwixt.ConnectionString) ([]pgtwixt.Dialer, error) {
+type Connector struct {
+	Debug pgtwixt.LogFunc
+}
+
+func (c Connector) Dialers(cs pgtwixt.ConnectionString) ([]pgtwixt.Dialer, error) {
 	if len(cs.Host) > 0 && len(cs.HostAddr) > 0 && len(cs.Host) != len(cs.HostAddr) {
 		return nil, fmt.Errorf("host and address lengths do not match: %v versus %v", cs.Host, cs.HostAddr)
 	}
@@ -38,11 +42,11 @@ func dialers(cs pgtwixt.ConnectionString) ([]pgtwixt.Dialer, error) {
 			host := get(cs.Host, i, "")
 			addr := get(cs.HostAddr, i, "")
 
-			ds[i], err = tcpDialer(host, addr, port, cs)
+			ds[i], err = c.tcpDialer(host, addr, port, cs)
 		} else {
 			host := get(cs.Host, i, "/tmp")
 
-			ds[i], err = unixDialer(host, port, cs)
+			ds[i], err = c.unixDialer(host, port, cs)
 		}
 
 		i++
@@ -51,8 +55,8 @@ func dialers(cs pgtwixt.ConnectionString) ([]pgtwixt.Dialer, error) {
 	return ds, err
 }
 
-func tcpDialer(host, hostaddr, port string, cs pgtwixt.ConnectionString) (pgtwixt.TCPDialer, error) {
-	var d pgtwixt.TCPDialer
+func (c Connector) tcpDialer(host, hostaddr, port string, cs pgtwixt.ConnectionString) (pgtwixt.TCPDialer, error) {
+	var d = pgtwixt.TCPDialer{Debug: c.Debug}
 	var err error
 
 	if hostaddr != "" {
@@ -75,8 +79,8 @@ func tcpDialer(host, hostaddr, port string, cs pgtwixt.ConnectionString) (pgtwix
 	return d, err
 }
 
-func unixDialer(host, port string, cs pgtwixt.ConnectionString) (pgtwixt.UnixDialer, error) {
-	var d pgtwixt.UnixDialer
+func (c Connector) unixDialer(host, port string, cs pgtwixt.ConnectionString) (pgtwixt.UnixDialer, error) {
+	var d = pgtwixt.UnixDialer{Debug: c.Debug}
 	var err error
 
 	d.Addr = host + "/.s.PGSQL." + port

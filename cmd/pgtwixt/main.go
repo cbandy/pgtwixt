@@ -1,13 +1,11 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"time"
 
 	"github.com/cbandy/pgtwixt"
@@ -51,26 +49,18 @@ func main() {
 		}
 	}()
 
-	var connector pgtwixt.Connector
-
-	if strings.HasPrefix(os.Args[3], "/") {
-		connector.Dialer = pgtwixt.UnixDialer{
-			Addr:  os.Args[3],
-			Debug: logger.Log,
-		}
-	} else {
-		connector.Dialer = pgtwixt.TCPDialer{
-			Addr:    os.Args[3],
-			Debug:   logger.Log,
-			SSLMode: "prefer",
-			SSLConfig: tls.Config{
-				InsecureSkipVerify: true,
-				MinVersion:         tls.VersionTLS12,
-				Renegotiation:      tls.RenegotiateFreelyAsClient,
-			},
-		}
+	var connstr pgtwixt.ConnectionString
+	err = connstr.Parse(os.Args[3])
+	if err != nil {
+		panic(err)
 	}
 
+	ds, err := Connector{Debug: logger.Log}.Dialers(connstr)
+	if err != nil {
+		panic(err)
+	}
+
+	connector := pgtwixt.Connector{Dialer: ds[0]}
 	proxy := pgtwixt.Proxy{
 		Info: logger.Log,
 

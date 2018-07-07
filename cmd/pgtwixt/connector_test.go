@@ -13,7 +13,7 @@ import (
 func TestDialersDefault(t *testing.T) {
 	t.Parallel()
 
-	ds, err := dialers(pgtwixt.ConnectionString{})
+	ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{})
 	require.NoError(t, err)
 	require.Len(t, ds, 1)
 
@@ -26,7 +26,7 @@ func TestDialersTCP(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Host", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"example.com"},
 		})
 		require.NoError(t, err)
@@ -43,7 +43,7 @@ func TestDialersTCP(t *testing.T) {
 	})
 
 	t.Run("HostAddr", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			HostAddr: []string{"127.0.0.1"},
 		})
 		require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestDialersTCP(t *testing.T) {
 	})
 
 	t.Run("HostPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"example.com"},
 			Port: []string{"888"},
 		})
@@ -77,7 +77,7 @@ func TestDialersTCP(t *testing.T) {
 	})
 
 	t.Run("HostAddrPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			HostAddr: []string{"127.0.0.1"},
 			Port:     []string{"99"},
 		})
@@ -97,7 +97,7 @@ func TestDialersTCP(t *testing.T) {
 
 	t.Run("SSL", func(t *testing.T) {
 		t.Run("Mode", func(t *testing.T) {
-			ds, err := dialers(pgtwixt.ConnectionString{
+			ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 				Host:    []string{"example.com"},
 				SSLMode: "something",
 			})
@@ -145,7 +145,7 @@ func TestDialersTCP(t *testing.T) {
 	})
 
 	t.Run("Timeout", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host:           []string{"example.com"},
 			ConnectTimeout: "10",
 		})
@@ -168,7 +168,7 @@ func TestDialersTCPError(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Timeout", func(t *testing.T) {
-		_, err := dialers(pgtwixt.ConnectionString{
+		_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host:           []string{"example.com"},
 			ConnectTimeout: "nope",
 		})
@@ -180,7 +180,7 @@ func TestDialersUnix(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Host", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"/var/run/postgresql"},
 		})
 		require.NoError(t, err)
@@ -192,7 +192,7 @@ func TestDialersUnix(t *testing.T) {
 	})
 
 	t.Run("Port", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Port: []string{"999"},
 		})
 		require.NoError(t, err)
@@ -204,7 +204,7 @@ func TestDialersUnix(t *testing.T) {
 	})
 
 	t.Run("Others", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			ConnectTimeout: "10",
 			RequirePeer:    "baz",
 		})
@@ -223,7 +223,7 @@ func TestDialersUnixError(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Timeout", func(t *testing.T) {
-		_, err := dialers(pgtwixt.ConnectionString{
+		_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			ConnectTimeout: "nope",
 		})
 		assert.Error(t, err)
@@ -234,7 +234,7 @@ func TestDialersMultipleError(t *testing.T) {
 	t.Parallel()
 
 	t.Run("TooManyHosts", func(t *testing.T) {
-		_, err := dialers(pgtwixt.ConnectionString{
+		_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host:     []string{"1", "2"},
 			HostAddr: []string{"1"},
 		})
@@ -242,7 +242,7 @@ func TestDialersMultipleError(t *testing.T) {
 	})
 
 	t.Run("TooManyHostAddr", func(t *testing.T) {
-		_, err := dialers(pgtwixt.ConnectionString{
+		_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host:     []string{"1"},
 			HostAddr: []string{"1", "2"},
 		})
@@ -251,7 +251,7 @@ func TestDialersMultipleError(t *testing.T) {
 
 	t.Run("TooManyPort", func(t *testing.T) {
 		t.Run("Host", func(t *testing.T) {
-			_, err := dialers(pgtwixt.ConnectionString{
+			_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 				Host: []string{"1"},
 				Port: []string{"1", "2"},
 			})
@@ -259,7 +259,7 @@ func TestDialersMultipleError(t *testing.T) {
 		})
 
 		t.Run("HostAddr", func(t *testing.T) {
-			_, err := dialers(pgtwixt.ConnectionString{
+			_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 				HostAddr: []string{"1"},
 				Port:     []string{"1", "2"},
 			})
@@ -269,7 +269,7 @@ func TestDialersMultipleError(t *testing.T) {
 
 	t.Run("TooFewPort", func(t *testing.T) {
 		t.Run("Host", func(t *testing.T) {
-			_, err := dialers(pgtwixt.ConnectionString{
+			_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 				Host: []string{"1", "2", "3"},
 				Port: []string{"1", "2"},
 			})
@@ -277,7 +277,7 @@ func TestDialersMultipleError(t *testing.T) {
 		})
 
 		t.Run("HostAddr", func(t *testing.T) {
-			_, err := dialers(pgtwixt.ConnectionString{
+			_, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 				HostAddr: []string{"1", "2", "3"},
 				Port:     []string{"1", "2"},
 			})
@@ -290,7 +290,7 @@ func TestDialersMultipleHost(t *testing.T) {
 	t.Parallel()
 
 	t.Run("DefaultPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"example.com", "/var/run/postgresql"},
 		})
 		require.NoError(t, err)
@@ -310,7 +310,7 @@ func TestDialersMultipleHost(t *testing.T) {
 	})
 
 	t.Run("OnePort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"example.com", "/var/run/postgresql"},
 			Port: []string{"1000"},
 		})
@@ -331,7 +331,7 @@ func TestDialersMultipleHost(t *testing.T) {
 	})
 
 	t.Run("TwoPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			Host: []string{"example.com", "/var/run/postgresql"},
 			Port: []string{"1000", "2000"},
 		})
@@ -356,7 +356,7 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 	t.Parallel()
 
 	t.Run("DefaultPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			HostAddr: []string{"127.0.0.1", "::1"},
 		})
 		require.NoError(t, err)
@@ -379,7 +379,7 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 	})
 
 	t.Run("OnePort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			HostAddr: []string{"127.0.0.1", "::1"},
 			Port:     []string{"1000"},
 		})
@@ -403,7 +403,7 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 	})
 
 	t.Run("TwoPort", func(t *testing.T) {
-		ds, err := dialers(pgtwixt.ConnectionString{
+		ds, err := Connector{}.Dialers(pgtwixt.ConnectionString{
 			HostAddr: []string{"127.0.0.1", "::1"},
 			Port:     []string{"1000", "2000"},
 		})

@@ -1,7 +1,8 @@
+import contextlib
 import subprocess
 import time
 
-from radish import given
+from radish import after, before, given
 import testgres
 
 class PgTwixt(object):
@@ -23,27 +24,42 @@ class PgTwixt(object):
         if self._process:
             self._process.terminate()
 
-def pgtwixt_instance(context):
-    if not hasattr(context, 'processes'): context.processes = {}
+    @property
+    def output(self):
+        if self._process:
+            return self._process.stdout
 
+def pgtwixt_instance(context):
     if 'pgtwixt' not in context.processes:
-        process = PgTwixt()
-        context.cleanups.callback(process.cleanup)
-        context.processes['pgtwixt'] = process
+        context.processes['pgtwixt'] = PgTwixt()
 
     return context.processes['pgtwixt']
 
 def postgres_instance(context, name):
-    if not hasattr(context, 'processes'): context.processes = {}
-    context.processes.setdefault('postgres', {})
-
     if name not in context.processes['postgres']:
         node = testgres.PostgresNode(name).init()
-        context.cleanups.push(node)
         context.processes['postgres'][name] = node
 
     return context.processes['postgres'][name]
 
+@before.each_scenario
+def processes_before(scenario):
+    scenario.context.processes = {'postgres': {}}
+
+@after.each_scenario
+def processes_after(scenario):
+    processes = scenario.context.processes
+
+    if 'pgtwixt' in processes:
+        process = processes['pgtwixt']
+        process.cleanup()
+
+        if scenario.state == 'failed':
+            print("PgTwixt output:\n{}\n".format(process.output.read().decode('utf8')))
+
+    with contextlib.ExitStack() as stack:
+        for node in processes['postgres'].values():
+            stack.push(node)
 
 @given('it is running')
 def start_something(step):
@@ -67,7 +83,7 @@ def start_postgres(step, name):
 def configure_pgtwixt_backend(step, postgres_name):
     postgres = postgres_instance(step.context, postgres_name)
     step.context.subject = pgtwixt_instance(step.context)
-    step.context.subject.location = '127.0.0.1:{}'.format(postgres.port)
+    step.context.subject.location = 'host=127.0.0.1 port={} sslmode=prefer'.format(postgres.port)
 
 @given('pgtwixt is running')
 def start_pgtwixt(step):
