@@ -68,15 +68,15 @@ func main() {
 
 		CountConnect: func() func() {
 			var (
-				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
-				connects    = metrics.backend.connects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": connector.Addr()})
+				connects    = metrics.backend.connects.With(prometheus.Labels{"backend": "yes", "host": connector.Addr()})
 			)
 			return func() { connections.Inc(); connects.Inc() }
 		}(),
 		CountDisconnect: func() func() {
 			var (
-				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
-				disconnects = metrics.backend.disconnects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": connector.Addr()})
+				disconnects = metrics.backend.disconnects.With(prometheus.Labels{"backend": "yes", "host": connector.Addr()})
 			)
 			return func() { connections.Dec(); disconnects.Inc() }
 		}(),

@@ -15,15 +15,17 @@ import (
 type UnixDialer struct {
 	Debug LogFunc
 
-	Addr        string // "/var/run/postgresql/.s.PGSQL.5432"
+	Address     string // "/var/run/postgresql/.s.PGSQL.5432"
 	RequirePeer string
 	Timeout     time.Duration
 }
 
+func (d UnixDialer) Addr() string { return d.Address }
+
 // Dial opens a new connection to the backend and verifies the owner of the socket.
 func (d UnixDialer) Dial(ctx context.Context) (BackendStream, error) {
 	nd := net.Dialer{Timeout: d.Timeout}
-	conn, err := nd.DialContext(ctx, "unix", d.Addr)
+	conn, err := nd.DialContext(ctx, "unix", d.Address)
 
 	if err == nil {
 		err = d.verify(conn)

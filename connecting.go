@@ -49,13 +49,14 @@ func (cn Connector) Startup(options map[string]string) (BackendStream, error) {
 }
 
 type Dialer interface {
+	Addr() string
 	Dial(context.Context) (BackendStream, error)
 }
 
 type TCPDialer struct {
 	Debug LogFunc
 
-	Addr      string // "yahoo.com:8080" "1.2.3.4:9999"
+	Address   string // "yahoo.com:8080" "1.2.3.4:9999"
 	SSLMode   string
 	SSLConfig tls.Config
 	Timeout   time.Duration
@@ -67,10 +68,12 @@ type TCPDialer struct {
 	// https://github.com/golang/go/blob/master/src/net/tcpsockopt_*.go
 }
 
+func (d TCPDialer) Addr() string { return d.Address }
+
 // Dial opens a new connection to the backend, negotiates any TLS upgrade, and verifies server certificates.
 func (d TCPDialer) Dial(ctx context.Context) (BackendStream, error) {
 	nd := net.Dialer{Timeout: d.Timeout}
-	conn, err := nd.DialContext(ctx, "tcp", d.Addr)
+	conn, err := nd.DialContext(ctx, "tcp", d.Address)
 
 	if err == nil {
 		err = conn.(*net.TCPConn).SetKeepAlive(true)

@@ -18,7 +18,7 @@ func TestDialersDefault(t *testing.T) {
 	require.Len(t, ds, 1)
 
 	assert.Equal(t, pgtwixt.UnixDialer{
-		Addr: "/tmp/.s.PGSQL.5432",
+		Address: "/tmp/.s.PGSQL.5432",
 	}, ds[0])
 }
 
@@ -33,7 +33,7 @@ func TestDialersTCP(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:5432",
+			Address: "example.com:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -50,7 +50,7 @@ func TestDialersTCP(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "127.0.0.1:5432",
+			Address: "127.0.0.1:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -67,7 +67,7 @@ func TestDialersTCP(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:888",
+			Address: "example.com:888",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -85,7 +85,7 @@ func TestDialersTCP(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "127.0.0.1:99",
+			Address: "127.0.0.1:99",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -105,7 +105,7 @@ func TestDialersTCP(t *testing.T) {
 			require.Len(t, ds, 1)
 
 			assert.Equal(t, pgtwixt.TCPDialer{
-				Addr:    "example.com:5432",
+				Address: "example.com:5432",
 				SSLMode: "something",
 				SSLConfig: tls.Config{
 					MinVersion:    tls.VersionTLS12,
@@ -153,7 +153,7 @@ func TestDialersTCP(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:5432",
+			Address: "example.com:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -187,7 +187,7 @@ func TestDialersUnix(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr: "/var/run/postgresql/.s.PGSQL.5432",
+			Address: "/var/run/postgresql/.s.PGSQL.5432",
 		}, ds[0])
 	})
 
@@ -199,7 +199,7 @@ func TestDialersUnix(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr: "/tmp/.s.PGSQL.999",
+			Address: "/tmp/.s.PGSQL.999",
 		}, ds[0])
 	})
 
@@ -212,7 +212,7 @@ func TestDialersUnix(t *testing.T) {
 		require.Len(t, ds, 1)
 
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr:        "/tmp/.s.PGSQL.5432",
+			Address:     "/tmp/.s.PGSQL.5432",
 			RequirePeer: "baz",
 			Timeout:     10 * time.Second,
 		}, ds[0])
@@ -297,7 +297,7 @@ func TestDialersMultipleHost(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:5432",
+			Address: "example.com:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -305,7 +305,7 @@ func TestDialersMultipleHost(t *testing.T) {
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr: "/var/run/postgresql/.s.PGSQL.5432",
+			Address: "/var/run/postgresql/.s.PGSQL.5432",
 		}, ds[1])
 	})
 
@@ -318,7 +318,7 @@ func TestDialersMultipleHost(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:1000",
+			Address: "example.com:1000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -326,7 +326,7 @@ func TestDialersMultipleHost(t *testing.T) {
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr: "/var/run/postgresql/.s.PGSQL.1000",
+			Address: "/var/run/postgresql/.s.PGSQL.1000",
 		}, ds[1])
 	})
 
@@ -339,7 +339,7 @@ func TestDialersMultipleHost(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "example.com:1000",
+			Address: "example.com:1000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -347,7 +347,7 @@ func TestDialersMultipleHost(t *testing.T) {
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.UnixDialer{
-			Addr: "/var/run/postgresql/.s.PGSQL.2000",
+			Address: "/var/run/postgresql/.s.PGSQL.2000",
 		}, ds[1])
 	})
 }
@@ -363,14 +363,14 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "127.0.0.1:5432",
+			Address: "127.0.0.1:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "[::1]:5432",
+			Address: "[::1]:5432",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -387,14 +387,14 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "127.0.0.1:1000",
+			Address: "127.0.0.1:1000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "[::1]:1000",
+			Address: "[::1]:1000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
@@ -411,14 +411,14 @@ func TestDialersMultipleHostAddr(t *testing.T) {
 		require.Len(t, ds, 2)
 
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "127.0.0.1:1000",
+			Address: "127.0.0.1:1000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,
 			},
 		}, ds[0])
 		assert.Equal(t, pgtwixt.TCPDialer{
-			Addr: "[::1]:2000",
+			Address: "[::1]:2000",
 			SSLConfig: tls.Config{
 				MinVersion:    tls.VersionTLS12,
 				Renegotiation: tls.RenegotiateFreelyAsClient,

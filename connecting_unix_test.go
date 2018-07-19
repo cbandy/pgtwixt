@@ -30,7 +30,7 @@ func TestUnixDialerRequirePeer(t *testing.T) {
 	defer listener.Close()
 
 	t.Run("None", func(t *testing.T) {
-		d := UnixDialer{Addr: spath}
+		d := UnixDialer{Address: spath}
 		_, err := d.Dial(context.Background())
 		assert.NoError(t, err)
 	})
@@ -39,13 +39,13 @@ func TestUnixDialerRequirePeer(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Right", func(t *testing.T) {
-		d := UnixDialer{Addr: spath, RequirePeer: u.Username}
+		d := UnixDialer{Address: spath, RequirePeer: u.Username}
 		_, err := d.Dial(context.Background())
 		assert.NoError(t, err)
 	})
 
 	t.Run("Wrong", func(t *testing.T) {
-		d := UnixDialer{Addr: spath, RequirePeer: "nope" + u.Username}
+		d := UnixDialer{Address: spath, RequirePeer: "nope" + u.Username}
 		_, err := d.Dial(context.Background())
 		assert.Error(t, err)
 	})

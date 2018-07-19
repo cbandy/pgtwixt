@@ -140,7 +140,7 @@ func TestTCPDialerVerify(t *testing.T) {
 	t.Run("Require", func(t *testing.T) {
 		t.Run("Right", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "require",
 			}
 
@@ -151,7 +151,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("Wrong", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "require",
 			}
 
@@ -164,7 +164,7 @@ func TestTCPDialerVerify(t *testing.T) {
 	t.Run("CA", func(t *testing.T) {
 		t.Run("Right", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-ca",
 				SSLConfig: tls.Config{
 					RootCAs: pool,
@@ -178,7 +178,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("None", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-ca",
 				SSLConfig: tls.Config{
 					RootCAs: pool,
@@ -192,7 +192,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("Wrong", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-ca",
 			}
 
@@ -205,7 +205,7 @@ func TestTCPDialerVerify(t *testing.T) {
 	t.Run("Full", func(t *testing.T) {
 		t.Run("Right", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-full",
 				SSLConfig: tls.Config{
 					RootCAs:    pool,
@@ -220,7 +220,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("None", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-full",
 				SSLConfig: tls.Config{
 					RootCAs:    pool,
@@ -235,7 +235,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("UntrustedCert", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-full",
 				SSLConfig: tls.Config{
 					ServerName: "localhost",
@@ -249,7 +249,7 @@ func TestTCPDialerVerify(t *testing.T) {
 
 		t.Run("WrongHostname", func(t *testing.T) {
 			d := TCPDialer{
-				Addr:    listener.Addr().String(),
+				Address: listener.Addr().String(),
 				SSLMode: "verify-full",
 				SSLConfig: tls.Config{
 					RootCAs:    pool,

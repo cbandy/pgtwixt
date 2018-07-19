@@ -60,9 +60,9 @@ func (c Connector) tcpDialer(host, hostaddr, port string, cs pgtwixt.ConnectionS
 	var err error
 
 	if hostaddr != "" {
-		d.Addr = net.JoinHostPort(hostaddr, port)
+		d.Address = net.JoinHostPort(hostaddr, port)
 	} else {
-		d.Addr = net.JoinHostPort(host, port)
+		d.Address = net.JoinHostPort(host, port)
 	}
 
 	d.SSLMode = cs.SSLMode
@@ -83,7 +83,7 @@ func (c Connector) unixDialer(host, port string, cs pgtwixt.ConnectionString) (p
 	var d = pgtwixt.UnixDialer{Debug: c.Debug}
 	var err error
 
-	d.Addr = host + "/.s.PGSQL." + port
+	d.Address = host + "/.s.PGSQL." + port
 	d.RequirePeer = cs.RequirePeer
 
 	if cs.ConnectTimeout != "" {
