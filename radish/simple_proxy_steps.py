@@ -16,21 +16,21 @@ def log_connect(step):
     metrics = list(text_string_to_metric_families(requests.get('http://{.metrics}'.format(step.context.processes['pgtwixt'])).text))
 
     connects = next(m for m in metrics if m.name == 'pgtwixt_connects_total').samples
-    assert next(s for s in connects if 'frontend' in s[1])[2] == 1
-    assert next(s for s in connects if 'backend' in s[1])[2] == 1
+    assert next(s for s in connects if 'bind' in s[1])[2] == 1
+    assert next(s for s in connects if 'host' in s[1])[2] == 1
 
     connections = next(m for m in metrics if m.name == 'pgtwixt_connections').samples
-    assert next(s for s in connections if 'frontend' in s[1])[2] == 1
-    assert next(s for s in connections if 'backend' in s[1])[2] == 1
+    assert next(s for s in connections if 'bind' in s[1])[2] == 1
+    assert next(s for s in connections if 'host' in s[1])[2] == 1
 
 @then('pgtwixt reports a frontend and a backend disconnect')
 def log_disconnect(step):
     metrics = list(text_string_to_metric_families(requests.get('http://{.metrics}'.format(step.context.processes['pgtwixt'])).text))
 
     disconnects = next(m for m in metrics if m.name == 'pgtwixt_disconnects_total').samples
-    assert next(s for s in disconnects if 'frontend' in s[1])[2] == 1
-    assert next(s for s in disconnects if 'backend' in s[1])[2] == 1
+    assert next(s for s in disconnects if 'bind' in s[1])[2] == 1
+    assert next(s for s in disconnects if 'host' in s[1])[2] == 1
 
     connections = next(m for m in metrics if m.name == 'pgtwixt_connections').samples
-    assert next(s for s in connections if 'frontend' in s[1])[2] == 0
-    assert next(s for s in connections if 'backend' in s[1])[2] == 0
+    assert next(s for s in connections if 'bind' in s[1])[2] == 0
+    assert next(s for s in connections if 'host' in s[1])[2] == 0

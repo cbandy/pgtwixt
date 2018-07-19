@@ -28,19 +28,19 @@ func init() {
 		metrics.backend.connections = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "pgtwixt_connections",
 			Help: "Current number of connections to both frontends and backends.",
-		}, []string{"backend", "host"})
+		}, []string{"host"})
 		backend.MustRegister(metrics.backend.connections)
 
 		metrics.backend.connects = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "pgtwixt_connects_total",
 			Help: "Total number of connects to both frontends and backends.",
-		}, []string{"backend", "host"})
+		}, []string{"host"})
 		backend.MustRegister(metrics.backend.connects)
 
 		metrics.backend.disconnects = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "pgtwixt_disconnects_total",
 			Help: "Total number of disconnects from both frontends and backends.",
-		}, []string{"backend", "host"})
+		}, []string{"host"})
 		backend.MustRegister(metrics.backend.disconnects)
 
 		return
@@ -52,19 +52,19 @@ func init() {
 		metrics.frontend.connections = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "pgtwixt_connections",
 			Help: "Current number of connections to both frontends and backends.",
-		}, []string{"frontend", "bind"})
+		}, []string{"bind"})
 		frontend.MustRegister(metrics.frontend.connections)
 
 		metrics.frontend.connects = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "pgtwixt_connects_total",
 			Help: "Total number of connects to both frontends and backends.",
-		}, []string{"frontend", "bind"})
+		}, []string{"bind"})
 		frontend.MustRegister(metrics.frontend.connects)
 
 		metrics.frontend.disconnects = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "pgtwixt_disconnects_total",
 			Help: "Total number of disconnects from both frontends and backends.",
-		}, []string{"frontend", "bind"})
+		}, []string{"bind"})
 		frontend.MustRegister(metrics.frontend.disconnects)
 
 		return
