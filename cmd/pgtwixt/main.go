@@ -66,8 +66,20 @@ func main() {
 
 		Startup: connector.Startup,
 
-		CountConnect:    metrics.backend.connects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]}).Inc,
-		CountDisconnect: metrics.backend.disconnects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]}).Inc,
+		CountConnect: func() func() {
+			var (
+				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+				connects    = metrics.backend.connects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+			)
+			return func() { connections.Inc(); connects.Inc() }
+		}(),
+		CountDisconnect: func() func() {
+			var (
+				connections = metrics.backend.connections.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+				disconnects = metrics.backend.disconnects.With(prometheus.Labels{"backend": "yes", "host": os.Args[3]})
+			)
+			return func() { connections.Dec(); disconnects.Inc() }
+		}(),
 	}
 
 	srv := pgtwixt.Server{
@@ -84,8 +96,20 @@ func main() {
 			proxy.Run(fe, startup)
 		},
 
-		CountConnect:    metrics.frontend.connects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()}).Inc,
-		CountDisconnect: metrics.frontend.disconnects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()}).Inc,
+		CountConnect: func() func() {
+			var (
+				connections = metrics.frontend.connections.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()})
+				connects    = metrics.frontend.connects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()})
+			)
+			return func() { connections.Inc(); connects.Inc() }
+		}(),
+		CountDisconnect: func() func() {
+			var (
+				connections = metrics.frontend.connections.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()})
+				disconnects = metrics.frontend.disconnects.With(prometheus.Labels{"frontend": "yes", "bind": listen.Addr().String()})
+			)
+			return func() { connections.Dec(); disconnects.Inc() }
+		}(),
 	}
 
 	err = srv.Serve(listen)
