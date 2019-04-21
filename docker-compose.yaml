@@ -1,0 +1,18 @@
+version: '3.5'
+
+volumes:
+  dev-home: { labels: { project: pgtwixt } }
+
+services:
+  dev:
+    image: pgtwixt-dev
+    build:
+      labels: { project: pgtwixt }
+      context: dev
+      args:
+        - DOCKER_GROUP
+        - DOCKER_RELEASE
+        - DOCKER_USER
+    volumes:
+      - { target: /home/dev,      type: volume, source: dev-home }
+      - { target: /home/dev/code, type: bind,   source: ".", consistency: cached }
