@@ -15,7 +15,7 @@ def disconnect_pgtwixt(step):
 def log_connect(step):
     metrics = list(text_string_to_metric_families(requests.get('http://{.metrics}'.format(step.context.processes['pgtwixt'])).text))
 
-    connects = next(m for m in metrics if m.name == 'pgtwixt_connects_total').samples
+    connects = next(m for m in metrics if m.name == 'pgtwixt_connects').samples
     assert next(s for s in connects if 'bind' in s[1])[2] == 1
     assert next(s for s in connects if 'host' in s[1])[2] == 1
 
@@ -27,7 +27,7 @@ def log_connect(step):
 def log_disconnect(step):
     metrics = list(text_string_to_metric_families(requests.get('http://{.metrics}'.format(step.context.processes['pgtwixt'])).text))
 
-    disconnects = next(m for m in metrics if m.name == 'pgtwixt_disconnects_total').samples
+    disconnects = next(m for m in metrics if m.name == 'pgtwixt_disconnects').samples
     assert next(s for s in disconnects if 'bind' in s[1])[2] == 1
     assert next(s for s in disconnects if 'host' in s[1])[2] == 1
 
