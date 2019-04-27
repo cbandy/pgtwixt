@@ -1,0 +1,14 @@
+version: 1
+cli:
+analyze:
+  modules:
+
+  - name: github.com/cbandy/pgtwixt
+    type: go
+    target: github.com/cbandy/pgtwixt
+    path: .
+
+  - name: github.com/cbandy/pgtwixt/cmd/pgtwixt
+    type: go
+    target: github.com/cbandy/pgtwixt/cmd/pgtwixt
+    path: cmd/pgtwixt
