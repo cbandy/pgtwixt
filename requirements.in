@@ -1,4 +1,4 @@
-prometheus_client
-radish-bdd
+prometheus_client >= 0.4.0
+radish-bdd >= 0.8.2
 requests
 testgres

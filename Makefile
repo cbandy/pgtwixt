@@ -14,7 +14,7 @@ benchmark: *.go
 	go test -bench . -benchmem
 
 .PHONY: check
-check: *.go features/* radish/*
+check: *.go features/* radish/* requirements.txt
 	go test . ./cmd/pgtwixt
 	go build -o radish/pgtwixt ./cmd/pgtwixt
 	@command -v radish > /dev/null || pip install --requirement requirements.txt
